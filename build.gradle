@@ -24,6 +24,9 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'org.postgresql:postgresql:42.5.1'
 	implementation 'org.hibernate:hibernate-core:6.1.7.Final'
+	implementation 'org.apache.commons:commons-lang3:3.0'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('bootBuildImage') {
