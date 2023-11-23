@@ -2,6 +2,7 @@ package com.example.guardianvault.controller;
 
 import com.example.guardianvault.dto.AuthZCodeDTO;
 import com.example.guardianvault.service.OAuth2Service;
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,11 +20,12 @@ public class OAuth2Controller {
   @PostMapping("/verify-details")
   public String verifyUser(@RequestBody AuthZCodeDTO authZCodeDTO){
     if(StringUtils.equalsIgnoreCase(authZCodeDTO.getResponseType(), "code")){
-        if(oAuth2Service.verifyUserDetails(authZCodeDTO)) {
+        if(oAuth2Service.verifyUserDetails(authZCodeDTO)
+            || oAuth2Service.verifyClientDetails(authZCodeDTO.getClientId())) {
           return "You are verified !";
         }
         else{
-          throw new BadCredentialsException("Incorrect password");
+          throw new EntityNotFoundException("Incorrect details");
         }
     }
     return "Not supported";
