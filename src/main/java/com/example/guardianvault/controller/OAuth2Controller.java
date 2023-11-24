@@ -5,8 +5,6 @@ import com.example.guardianvault.service.OAuth2Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,9 +18,8 @@ public class OAuth2Controller {
   @PostMapping("/verify-details")
   public String verifyUser(@RequestBody AuthZCodeDTO authZCodeDTO){
     if(StringUtils.equalsIgnoreCase(authZCodeDTO.getResponseType(), "code")){
-        if(oAuth2Service.verifyUserDetails(authZCodeDTO)
-            || oAuth2Service.verifyClientDetails(authZCodeDTO.getClientId())) {
-          return "You are verified !";
+        if(oAuth2Service.verifyUserDetails(authZCodeDTO) || oAuth2Service.verifyClientDetails(authZCodeDTO.getClientId())) {
+          return oAuth2Service.generateAuthZCode(authZCodeDTO);
         }
         else{
           throw new EntityNotFoundException("Incorrect details");
