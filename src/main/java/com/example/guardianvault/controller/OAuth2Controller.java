@@ -1,6 +1,8 @@
 package com.example.guardianvault.controller;
 
 import com.example.guardianvault.dto.AuthZCodeDTO;
+import com.example.guardianvault.dto.TokenDTO;
+import com.example.guardianvault.dto.TokenResponseDTO;
 import com.example.guardianvault.service.OAuth2Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.lang3.StringUtils;
@@ -26,5 +28,15 @@ public class OAuth2Controller {
         }
     }
     return "Not supported";
+  }
+
+  @PostMapping("/token")
+  public TokenResponseDTO getToken(@RequestBody TokenDTO tokenDTO){
+    if(StringUtils.equalsIgnoreCase(tokenDTO.getGrantType(), "code")){
+      TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
+      tokenResponseDTO.setToken(oAuth2Service.generateTokenFromAuthZCode(tokenDTO));
+      return tokenResponseDTO;
+    }
+    return null;
   }
 }

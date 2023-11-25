@@ -1,7 +1,6 @@
 package com.example.guardianvault.controller;
 
 import com.example.guardianvault.dto.ClientDTO;
-import com.example.guardianvault.entity.Client;
 import com.example.guardianvault.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +16,7 @@ public class ClientController {
   ClientService clientService;
 
   @PostMapping("/clients/register")
-  public Client registerClient(@RequestBody ClientDTO clientDTO){
+  public ClientDTO registerClient(@RequestBody ClientDTO clientDTO){
     return clientService.registerClientDetails(clientDTO);
   }
 

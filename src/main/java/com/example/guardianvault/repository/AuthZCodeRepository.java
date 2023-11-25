@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AuthZCodeRepository extends JpaRepository<AuthZCode, String> {
 
+  AuthZCode findByClientId(String clientId);
+
 }
