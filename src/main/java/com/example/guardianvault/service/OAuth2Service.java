@@ -65,7 +65,6 @@ public class OAuth2Service {
     return code;
   }
 
-  @Transactional(readOnly = true)
   public String generateTokenFromAuthZCode(TokenDTO tokenDTO){
     validateClientDetails(tokenDTO);
     validateAuthZCode(tokenDTO);

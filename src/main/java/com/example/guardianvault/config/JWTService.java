@@ -2,14 +2,18 @@ package com.example.guardianvault.config;
 
 
 import com.example.guardianvault.entity.Client;
+import com.example.guardianvault.entity.VaultKeys;
 import com.example.guardianvault.repository.ClientRepository;
+import com.example.guardianvault.repository.VaultKeysRepository;
 import io.jsonwebtoken.Jwts;
 
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +26,9 @@ public class JWTService {
   @Autowired
   ClientRepository clientRepository;
 
-  public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+  @Autowired
+  VaultKeysRepository vaultKeysRepository;
+
   public String generateToken(String clientId) {
     Map<String, Object> claims = new HashMap<>();
     var client = clientRepository.findByClientId(clientId);
@@ -31,22 +37,41 @@ public class JWTService {
   }
 
   private String createToken(Map<String, Object> claims) {
+    KeyPair keyPair = generateRSAKeys();
+    Key privateKey = keyPair.getPrivate();
+    Key publicKey = keyPair.getPublic();
+    persistKeys(privateKey, publicKey);
     return Jwts.builder()
         .setClaims(claims)
+        .setIssuer("guardian-vault")
         .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
-        .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
-  }
-
-  private Key getSignKey() {
-    byte[] keyBytes= Decoders.BASE64.decode(SECRET);
-    return Keys.hmacShaKeyFor(keyBytes);
+        .signWith(privateKey, SignatureAlgorithm.RS256).compact();
   }
 
   private Map<String, Object> setClaims(Client client, Map<String, Object> claims){
     claims.put("scp", new ArrayList<>(client.getScopes()));
     claims.put("cid", client.getClientId());
     return claims;
+  }
+
+  private KeyPair generateRSAKeys() {
+    KeyPairGenerator keyPairGenerator = null;
+    try{
+      keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+    }
+    catch (NoSuchAlgorithmException exception){
+      System.out.println("Unable to generate keys!");
+    }
+    keyPairGenerator.initialize(2048);
+    return keyPairGenerator.generateKeyPair();
+  }
+
+  private void persistKeys(Key privateKey, Key publicKey){
+    VaultKeys vaultKeys = new VaultKeys();
+    vaultKeys.setPrivateKey(Base64.getEncoder().encodeToString(privateKey.getEncoded()));
+    vaultKeys.setPublicKey(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+    vaultKeysRepository.save(vaultKeys);
   }
 
 }

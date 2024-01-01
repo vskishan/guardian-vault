@@ -13,11 +13,11 @@ public class OAuthSecurityConfig {
   SecurityFilterChain securityConfig(HttpSecurity httpSecurity) throws Exception{
     httpSecurity.httpBasic(Customizer.withDefaults())
     .authorizeHttpRequests(request -> {
-      request.requestMatchers("/users/register", "/clients/register", "/verify-details", "/token").permitAll()
+      request.requestMatchers("/users/register", "/clients/register", "/verify-details", "/token", "/oauth2/jwks").permitAll()
             .requestMatchers("/users/*","/clients/*/details").authenticated();
     })
     .csrf(csrf -> {
-      csrf.ignoringRequestMatchers("/users/register", "/clients/register", "/verify-details", "/token");
+      csrf.ignoringRequestMatchers("/users/register", "/clients/register", "/verify-details", "/token", "/oauth2/jwks");
     });
     return httpSecurity.build();
   }
