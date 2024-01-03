@@ -16,20 +16,12 @@ public class VaultKeyService {
   @Autowired
   VaultKeysRepository vaultKeysRepository;
 
-  public PublicKey getPublicKey(){
+  public String getPublicKey(){
     VaultKeys latestKey = vaultKeysRepository.findTopByOrderByIdDesc();
     VaultKeys vaultKeys = vaultKeysRepository.findById(latestKey.getId()).orElse(null);
-    PublicKey pubKey = null;
-    try {
-      String publicK = vaultKeys.getPublicKey();
-      byte[] publicBytes = Base64.getDecoder().decode(publicK);
-      X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
-      KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-      pubKey = keyFactory.generatePublic(keySpec);
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
-    return pubKey;
+    String publicKey = Base64.getDecoder().decode(vaultKeys.getPublicKey()).toString();
+
+    return publicKey;
   }
 
 }

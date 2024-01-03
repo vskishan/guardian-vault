@@ -16,7 +16,7 @@ public class JWTPublicKey {
 
 
   @GetMapping("/oauth2/jwks")
-  public PublicKey getJWTPubKey(){
+  public String getJWTPubKey(){
     return vaultKeyService.getPublicKey();
   }
 
